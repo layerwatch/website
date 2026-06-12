@@ -1,13 +1,5 @@
 {
-	"compatibility_date": "2026-06-12",
-	"compatibility_flags": ["global_fetch_strictly_public"],
-	"name": "layerwatch-website",
-	"main": "@astrojs/cloudflare/entrypoints/server",
-	"assets": {
-		"directory": "./dist",
-		"binding": "ASSETS"
-	},
-	"observability": {
-		"enabled": true
-	}
+  "name": "layerwatch-website",
+  "compatibility_date": "2025-01-01",
+  "compatibility_flags": ["nodejs_compat"]
 }
