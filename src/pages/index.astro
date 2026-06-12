@@ -1,17 +1,189 @@
 ---
-
+import Layout from '../layouts/Layout.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout 
+  title="Layerwatch — Runtime visibility for AI coding agents"
+  description="See everything your AI coding agent touches. Layerwatch sits between your AI agent and your system — logging every file read, shell command, and API call before something goes wrong."
+>
+
+  <!-- Hero -->
+  <section class="min-h-screen flex flex-col items-center justify-center px-6 text-center relative overflow-hidden">
+    
+    <!-- Background glow -->
+    <div class="absolute inset-0 bg-gradient-to-b from-blue-950/30 via-gray-950 to-gray-950 pointer-events-none"></div>
+    
+    <!-- Badge -->
+    <div class="relative z-10 mb-6 inline-flex items-center gap-2 bg-blue-950/50 border border-blue-800/50 text-blue-400 text-sm px-4 py-1.5 rounded-full">
+      <span class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></span>
+      Early Access — Join the waitlist
+    </div>
+
+    <!-- Headline -->
+    <h1 class="relative z-10 text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight max-w-3xl leading-tight mb-6">
+      See everything your 
+      <span class="text-blue-400">AI agent</span> 
+      touches
+    </h1>
+
+    <!-- Subheadline -->
+    <p class="relative z-10 text-lg sm:text-xl text-gray-400 max-w-xl mb-10 leading-relaxed">
+      Claude Code, Cursor, and Copilot have unrestricted access to your machine. 
+      Layerwatch shows you exactly what they read, execute, and touch — in real time.
+    </p>
+
+    <!-- Email capture -->
+    <form 
+      id="waitlist-form"
+      class="relative z-10 flex flex-col sm:flex-row gap-3 w-full max-w-md mb-6"
+    >
+      <input
+        type="email"
+        id="email-input"
+        placeholder="you@company.com"
+        required
+        class="flex-1 bg-gray-900 border border-gray-700 text-white placeholder-gray-500 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-blue-500 transition-colors"
+      />
+      <button
+        type="submit"
+        class="bg-blue-600 hover:bg-blue-500 text-white font-medium px-6 py-3 rounded-lg text-sm transition-colors whitespace-nowrap"
+      >
+        Get Early Access
+      </button>
+    </form>
+
+    <!-- Success message (hidden by default) -->
+    <div id="success-message" class="relative z-10 hidden text-green-400 text-sm mb-6">
+      ✓ You're on the list. We'll be in touch.
+    </div>
+
+    <!-- Social proof -->
+    <p class="relative z-10 text-gray-600 text-xs">
+      No spam. No credit card. Just early access when we launch.
+    </p>
+
+  </section>
+
+  <!-- Pain points -->
+  <section class="px-6 pb-24">
+    <div class="max-w-4xl mx-auto">
+      
+      <p class="text-center text-gray-500 text-sm uppercase tracking-widest mb-12">
+        What's happening right now on your machine
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+          <div class="text-red-400 text-2xl mb-4">⚠️</div>
+          <h3 class="text-white font-medium mb-2">Silent file access</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">
+            Your AI agent reads <code class="text-red-400 bg-gray-900 px-1 rounded">.env</code>, <code class="text-red-400 bg-gray-900 px-1 rounded">~/.aws/credentials</code>, and SSH keys without telling you.
+          </p>
+        </div>
+
+        <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+          <div class="text-yellow-400 text-2xl mb-4">🔍</div>
+          <h3 class="text-white font-medium mb-2">No audit trail</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">
+            When something goes wrong, there is no log of what your agent accessed, executed, or modified during the session.
+          </p>
+        </div>
+
+        <div class="bg-gray-900/50 border border-gray-800 rounded-xl p-6">
+          <div class="text-orange-400 text-2xl mb-4">🔌</div>
+          <h3 class="text-white font-medium mb-2">Unvetted MCP servers</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">
+            Third-party MCP tools your agent calls can exfiltrate data to endpoints you never audited or approved.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- What Layerwatch does -->
+  <section class="px-6 pb-24 border-t border-gray-900">
+    <div class="max-w-3xl mx-auto text-center pt-24">
+      
+      <h2 class="text-3xl font-bold mb-4">
+        The layer your AI agent is missing
+      </h2>
+      <p class="text-gray-400 mb-16 leading-relaxed">
+        Layerwatch sits between your AI coding agent and everything it can touch — 
+        giving you visibility, control, and a tamper-evident audit trail.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+
+        <div class="flex gap-4 p-5 bg-gray-900/30 border border-gray-800 rounded-xl">
+          <span class="text-blue-400 text-xl mt-0.5">📋</span>
+          <div>
+            <h4 class="text-white font-medium mb-1">Session timeline</h4>
+            <p class="text-gray-500 text-sm">Every file read, command run, and API call — in chronological order, replayable.</p>
+          </div>
+        </div>
+
+        <div class="flex gap-4 p-5 bg-gray-900/30 border border-gray-800 rounded-xl">
+          <span class="text-blue-400 text-xl mt-0.5">🛡️</span>
+          <div>
+            <h4 class="text-white font-medium mb-1">Secret detection</h4>
+            <p class="text-gray-500 text-sm">Scans context before the prompt fires. Catches API keys, tokens, and credentials before they leave your machine.</p>
+          </div>
+        </div>
+
+        <div class="flex gap-4 p-5 bg-gray-900/30 border border-gray-800 rounded-xl">
+          <span class="text-blue-400 text-xl mt-0.5">🔒</span>
+          <div>
+            <h4 class="text-white font-medium mb-1">MCP proxy</h4>
+            <p class="text-gray-500 text-sm">Intercepts every tool call your agent makes. Log, inspect, and block based on rules you define.</p>
+          </div>
+        </div>
+
+        <div class="flex gap-4 p-5 bg-gray-900/30 border border-gray-800 rounded-xl">
+          <span class="text-blue-400 text-xl mt-0.5">📊</span>
+          <div>
+            <h4 class="text-white font-medium mb-1">Team dashboard</h4>
+            <p class="text-gray-500 text-sm">See agent activity across your entire engineering team. Set policies, get alerts, export compliance reports.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-gray-900 px-6 py-10">
+    <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      <p class="text-gray-600 text-sm">© 2026 Layerwatch. All rights reserved.</p>
+      <div class="flex gap-6 text-gray-600 text-sm">
+        <a href="https://github.com/layerwatch" class="hover:text-gray-400 transition-colors">GitHub</a>
+        <a href="https://x.com/layerwatch" class="hover:text-gray-400 transition-colors">X</a>
+        <a href="mailto:hi@layerwatch.dev" class="hover:text-gray-400 transition-colors">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Email capture script -->
+  <script>
+    const form = document.getElementById('waitlist-form') as HTMLFormElement;
+    const successMessage = document.getElementById('success-message');
+    const emailInput = document.getElementById('email-input') as HTMLInputElement;
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = emailInput.value;
+
+      // Store in localStorage for now
+      // Replace this with your email service (Resend, Mailchimp etc) later
+      const existing = JSON.parse(localStorage.getItem('waitlist') || '[]');
+      existing.push({ email, date: new Date().toISOString() });
+      localStorage.setItem('waitlist', JSON.stringify(existing));
+
+      // Show success
+      form.classList.add('hidden');
+      successMessage?.classList.remove('hidden');
+    });
+  </script>
+
+</Layout>
