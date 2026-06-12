@@ -34,11 +34,14 @@ import Layout from '../layouts/Layout.astro';
 
     <!-- Email capture -->
     <form 
-      id="waitlist-form"
-      class="relative z-10 flex flex-col sm:flex-row gap-3 w-full max-w-md mb-6"
+        id="waitlist-form"
+        action="https://formspree.io/f/mrevognv"
+        method="POST"
+        class="relative z-10 flex flex-col sm:flex-row gap-3 w-full max-w-md mb-6"
     >
       <input
         type="email"
+        name="email"
         id="email-input"
         placeholder="you@company.com"
         required
@@ -166,24 +169,31 @@ import Layout from '../layouts/Layout.astro';
 
   <!-- Email capture script -->
   <script>
-    const form = document.getElementById('waitlist-form') as HTMLFormElement;
-    const successMessage = document.getElementById('success-message');
-    const emailInput = document.getElementById('email-input') as HTMLInputElement;
+  const form = document.getElementById('waitlist-form') as HTMLFormElement;
+  const successMessage = document.getElementById('success-message');
 
-    form?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = emailInput.value;
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const data = new FormData(form);
+    
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      });
 
-      // Store in localStorage for now
-      // Replace this with your email service (Resend, Mailchimp etc) later
-      const existing = JSON.parse(localStorage.getItem('waitlist') || '[]');
-      existing.push({ email, date: new Date().toISOString() });
-      localStorage.setItem('waitlist', JSON.stringify(existing));
-
-      // Show success
-      form.classList.add('hidden');
-      successMessage?.classList.remove('hidden');
-    });
-  </script>
+      if (response.ok) {
+        form.classList.add('hidden');
+        successMessage?.classList.remove('hidden');
+      } else {
+        alert('Something went wrong. Please try again.');
+      }
+    } catch (error) {
+      alert('Something went wrong. Please try again.');
+    }
+  });
+</script>
 
 </Layout>
