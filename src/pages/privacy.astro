@@ -1,0 +1,192 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Privacy Policy — Layerwatch"
+  description="How Layerwatch collects, uses, and protects your information."
+>
+
+  <!-- Header -->
+  <div class="fixed top-4 sm:top-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-6xl">
+    <header class="flex items-center justify-between px-5 sm:px-7 h-16 rounded-2xl border border-border-subtle bg-surface/70 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.35)]">
+      <a href="/"><img src="/logo-header.png" alt="Layerwatch" class="h-14 w-auto" /></a>
+      <a
+        href="https://github.com/layerwatch"
+        class="hidden sm:inline-flex items-center gap-2 text-text-muted text-sm hover:text-white transition-colors"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.73.5.75 5.48.75 11.75c0 5.02 3.26 9.28 7.77 10.78.57.1.78-.25.78-.55 0-.27-.01-1.16-.02-2.1-3.16.69-3.83-1.34-3.83-1.34-.52-1.31-1.26-1.66-1.26-1.66-1.03-.7.08-.69.08-.69 1.14.08 1.74 1.17 1.74 1.17 1.01 1.73 2.65 1.23 3.3.94.1-.73.4-1.23.72-1.51-2.52-.29-5.17-1.26-5.17-5.6 0-1.24.44-2.25 1.17-3.04-.12-.29-.51-1.45.11-3.02 0 0 .96-.31 3.14 1.16a10.9 10.9 0 0 1 5.72 0c2.18-1.47 3.14-1.16 3.14-1.16.62 1.57.23 2.73.11 3.02.73.79 1.17 1.8 1.17 3.04 0 4.35-2.66 5.31-5.19 5.59.41.35.77 1.04.77 2.1 0 1.52-.01 2.74-.01 3.11 0 .3.2.66.79.55A11.26 11.26 0 0 0 23.25 11.75C23.25 5.48 18.27.5 12 .5Z"/></svg>
+        GitHub
+      </a>
+    </header>
+  </div>
+
+  <main class="relative px-6 pt-40 pb-28 max-w-3xl mx-auto">
+    <span class="eyebrow mb-4">Legal</span>
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mt-4 mb-3">Privacy Policy</h1>
+    <p class="text-text-muted/60 text-sm mb-14 font-mono">Effective August 21, 2026</p>
+
+    <div class="legal-content space-y-10 text-text-muted leading-relaxed">
+
+      <section>
+        <h2>Overview</h2>
+        <p>
+          This policy covers <strong class="text-white">layerwatch.dev</strong> and the free tools we publish
+          (the browser extension, and the open-source MCP proxy once released). It explains what we collect,
+          why, and how you can control it. The short version: we collect as little as possible, and we never
+          sell your data.
+        </p>
+      </section>
+
+      <section>
+        <h2>Information we collect</h2>
+        <p>We collect information in two ways:</p>
+        <ul>
+          <li>
+            <strong class="text-white">Waitlist signups.</strong> When you submit your email through the early
+            access form on this site, it's sent to and stored by our form provider, Formspree, so we can
+            notify you about access and product updates.
+          </li>
+          <li>
+            <strong class="text-white">Automatic connection logs.</strong> Like most websites, requests to
+            layerwatch.dev pass through our hosting provider, Cloudflare, which logs standard technical data
+            (IP address, browser type, request timestamps) for security and performance. We don't run our own
+            analytics or tracking scripts on this site.
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>How we use your information</h2>
+        <p>
+          We use your email solely to reach out about early access and material product updates. We do not
+          sell, rent, or share your information with third parties for marketing purposes.
+        </p>
+      </section>
+
+      <section>
+        <h2>Third-party services</h2>
+        <p>We rely on a small number of infrastructure providers to run this site:</p>
+        <ul>
+          <li><strong class="text-white">Formspree</strong> — processes waitlist form submissions.</li>
+          <li><strong class="text-white">Cloudflare</strong> — hosting, CDN, and security.</li>
+        </ul>
+        <p>Each operates under its own privacy policy governing the data it processes on our behalf.</p>
+      </section>
+
+      <section>
+        <h2>Cookies</h2>
+        <p>
+          layerwatch.dev does not set its own tracking or advertising cookies. Cloudflare may set minimal,
+          essential cookies required for security and site performance.
+        </p>
+      </section>
+
+      <section>
+        <h2>Data retention</h2>
+        <p>
+          We retain your email address for as long as you remain on the waitlist. You can request removal at
+          any time — see Contact below.
+        </p>
+      </section>
+
+      <section>
+        <h2>Your rights</h2>
+        <p>
+          You can request access to, correction of, or deletion of your personal data at any time by
+          contacting us. We will respond within a reasonable timeframe.
+        </p>
+      </section>
+
+      <section>
+        <h2>Children's privacy</h2>
+        <p>
+          Our services are not directed at children, and we do not knowingly collect information from anyone
+          under the age of 16.
+        </p>
+      </section>
+
+      <section>
+        <h2>Our products</h2>
+        <p>
+          The Layerwatch browser extension processes everything locally in your browser — it has no
+          background service worker and makes no network requests. Read the full
+          <a href="https://github.com/layerwatch/browser-extension/blob/main/PRIVACY_POLICY.md">extension privacy policy</a>
+          for details. The MCP proxy, when released, will run entirely on your own machine and write logs only
+          to your local filesystem — nothing is sent to Layerwatch.
+        </p>
+      </section>
+
+      <section>
+        <h2>Changes to this policy</h2>
+        <p>
+          If this policy changes, we'll update the effective date above and, for material changes, notify the
+          waitlist by email.
+        </p>
+      </section>
+
+      <section>
+        <h2>Contact</h2>
+        <p>
+          Questions about this policy or your data? Email
+          <a href="mailto:hi@layerwatch.dev">hi@layerwatch.dev</a>.
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="relative border-t border-border-subtle px-6 pt-16 pb-8 overflow-hidden">
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent"></div>
+
+    <div class="max-w-4xl mx-auto relative z-10">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-12">
+        <a href="/"><img src="/logo-header.png" alt="Layerwatch" class="h-10 w-auto self-start" /></a>
+
+        <div class="flex items-center gap-6">
+          <p class="text-text-muted/50 text-xs uppercase tracking-widest font-mono">Connect</p>
+          <ul class="flex items-center gap-6 text-sm">
+            <li><a href="https://github.com/layerwatch" class="text-text-muted hover:text-white transition-colors">GitHub</a></li>
+            <li><a href="https://x.com/layerwatch" class="text-text-muted hover:text-white transition-colors">X</a></li>
+            <li><a href="mailto:hi@layerwatch.dev" class="text-text-muted hover:text-white transition-colors">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="pt-6 border-t border-border-subtle flex flex-col sm:flex-row justify-between gap-2">
+        <p class="text-text-muted/60 text-xs">© 2026 Layerwatch. All rights reserved.</p>
+        <div class="flex gap-4">
+          <a href="/privacy" class="text-text-muted/60 hover:text-white text-xs transition-colors">Privacy</a>
+          <a href="/terms" class="text-text-muted/60 hover:text-white text-xs transition-colors">Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</Layout>
+
+<style>
+  .legal-content h2 {
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.01em;
+  }
+  .legal-content p { margin-bottom: 0.5rem; }
+  .legal-content ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+    margin: 0.75rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .legal-content a {
+    color: var(--color-primary-light);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .legal-content a:hover { color: white; }
+</style>

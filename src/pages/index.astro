@@ -260,8 +260,12 @@ const cells = Array.from({ length: CELL_COLS * CELL_ROWS });
         </div>
       </div>
 
-      <div class="pt-6 border-t border-border-subtle">
+      <div class="pt-6 border-t border-border-subtle flex flex-col sm:flex-row justify-between gap-2">
         <p class="text-text-muted/60 text-xs">© 2026 Layerwatch. All rights reserved.</p>
+        <div class="flex gap-4">
+          <a href="/privacy" class="text-text-muted/60 hover:text-white text-xs transition-colors">Privacy</a>
+          <a href="/terms" class="text-text-muted/60 hover:text-white text-xs transition-colors">Terms</a>
+        </div>
       </div>
     </div>
   </footer>
