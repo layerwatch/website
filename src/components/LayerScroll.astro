@@ -1,0 +1,266 @@
+---
+// "Layer by layer": what Layerwatch connects to at each layer of a running
+// system, and with what access. (The hero card shows *an answer*; this section
+// shows *where answers come from* — no repeated example values.)
+//
+// Sticky scrollytelling, the pattern Unblocked uses: the page scrolls normally,
+// the layer stack is pinned with CSS sticky, and one full-height text block per
+// layer scrolls past. Each layer animates in fully as its block reaches the
+// middle of the screen. Without motion (or JS) everything renders statically.
+
+const W = 190;
+const H = W / 2;
+const CX = 290;
+
+const layers = [
+  { key: 'code',    name: 'CODE',    color: '#5b9dff', cy: 118 },
+  { key: 'deploy',  name: 'DEPLOY',  color: '#a78bfa', cy: 240 },
+  { key: 'runtime', name: 'RUNTIME', color: '#34d399', cy: 362 },
+  { key: 'data',    name: 'DATA',    color: '#fbbf24', cy: 484 },
+];
+
+const pt = (cy: number, u: number, v: number) => ({ x: CX + (u - v) * (W / 2), y: cy + (u + v) * (H / 2) });
+const diamond = (cy: number) =>
+  [pt(cy, -1, -1), pt(cy, 1, -1), pt(cy, 1, 1), pt(cy, -1, 1)].map((p) => `${p.x},${p.y}`).join(' ');
+const grid = (cy: number) => {
+  const d: string[] = [];
+  for (const t of [-0.5, 0, 0.5]) {
+    const a = pt(cy, t, -1), b = pt(cy, t, 1), c = pt(cy, -1, t), e = pt(cy, 1, t);
+    d.push(`M${a.x},${a.y}L${b.x},${b.y}`, `M${c.x},${c.y}L${e.x},${e.y}`);
+  }
+  return d.join('');
+};
+
+const cyOf = Object.fromEntries(layers.map((l) => [l.key, l.cy]));
+
+// Nodes name the kinds of source Layerwatch reads at each layer.
+const nodes: Record<string, { layer: string; u: number; v: number; label: string }> = {
+  repoA:   { layer: 'code', u: -0.55, v: 0.1, label: 'git · ingest-service' },
+  repoB:   { layer: 'code', u: 0.45, v: -0.4, label: 'git · worker-service' },
+  repoC:   { layer: 'code', u: 0.3, v: 0.55, label: 'git · reporting-service' },
+  helm:    { layer: 'deploy', u: 0.25, v: 0.5, label: 'helm release' },
+  k8s:     { layer: 'deploy', u: -0.3, v: -0.35, label: 'k8s · namespace prod' },
+  broker:  { layer: 'runtime', u: -0.5, v: 0.15, label: 'redis broker' },
+  workers: { layer: 'runtime', u: 0.3, v: 0.35, label: 'celery workers' },
+  pgA:     { layer: 'data', u: 0.35, v: -0.3, label: 'reporting-db' },
+  pgB:     { layer: 'data', u: -0.3, v: 0.4, label: 'app-db' },
+};
+
+const P = Object.fromEntries(
+  Object.entries(nodes).map(([k, n]) => [k, pt(cyOf[n.layer], n.u, n.v)])
+);
+
+const threads = [
+  { path: ['repoC', 'helm', 'workers'], color: '#34d399' },
+  { path: ['repoA', 'broker', 'workers'], color: '#5b9dff' },
+  { path: ['repoB', 'k8s', 'workers', 'pgA'], color: '#fbbf24' },
+  { path: ['pgA', 'pgB'], color: '#fbbf24' },
+];
+const toD = (ids: string[]) => ids.map((id, i) => `${i ? 'L' : 'M'}${P[id].x},${P[id].y}`).join('');
+
+const steps = [
+  {
+    color: '#5b9dff', n: '01', title: 'Code',
+    body: 'Reads each selected repository at a pinned revision: task definitions, producer call sites and configuration reads. Your code is parsed, never imported or run.',
+    connects: 'GitHub / GitLab · Python today',
+    access: 'read-only checkout',
+  },
+  {
+    color: '#a78bfa', n: '02', title: 'Deploy',
+    body: 'Renders your actual Helm or Kustomize inputs with pinned versions, then compares them with the live Kubernetes objects.',
+    connects: 'Helm · Kustomize · Kubernetes',
+    access: 'namespace-scoped read · Secrets referenced, never read',
+  },
+  {
+    color: '#34d399', n: '03', title: 'Runtime',
+    body: 'Asks Celery workers what they are consuming, identifies the Redis broker, and uses the OpenTelemetry traces you already have.',
+    connects: 'Celery · Redis · OpenTelemetry',
+    access: 'allowlisted, rate-limited inspection',
+  },
+  {
+    color: '#fbbf24', n: '04', title: 'Data',
+    body: 'Reads schemas, tables and indexes from each datastore the workflow touches.',
+    connects: 'PostgreSQL',
+    access: 'fixed catalog queries · no row sampling, no arbitrary SQL',
+  },
+  {
+    color: 'url', n: '∞', title: 'Joined into one model',
+    body: 'Every fact keeps its source, version and timestamp, so answers stay checkable and refresh when something changes.',
+    connects: 'local UI · MCP for coding agents',
+    access: 'runs on your machine or in your cluster',
+  },
+];
+---
+
+<section id="layers" data-tone="violet" class="relative px-6 py-20 sm:py-24">
+  <div class="relative max-w-6xl mx-auto grid lg:grid-cols-[0.9fr_1.1fr] gap-x-12">
+
+    <!-- heading (phones and tablets): scrolls away normally, so the pinned panel can give the diagram more room -->
+    <div class="lg:hidden order-first text-center pb-6">
+      <h2 class="display text-[1.9rem] sm:text-4xl">
+        Your system is layers.<span class="serif-accent tone-accent block">We watch every one.</span>
+      </h2>
+      <p class="text-text-muted text-[15px] leading-relaxed mt-3 max-w-md mx-auto">
+        Where the answers come from, and exactly what access each layer needs.
+      </p>
+    </div>
+
+    <!-- Pinned visual (CSS sticky — the page itself scrolls normally) -->
+    <div class="order-1 lg:order-2 self-start sticky top-[4.5rem] lg:top-0 z-10 lg:h-screen flex flex-col items-center justify-center pt-3 pb-9 lg:pt-28 lg:pb-10 bg-[linear-gradient(to_bottom,var(--color-background)_94%,transparent)] lg:bg-none -mx-6 px-6 lg:mx-0 lg:px-0">
+      <!-- label (phones and tablets): the only heading kept pinned -->
+      <p class="lg:hidden eyebrow mb-3 justify-center">Layer by layer</p>
+
+      <div class="flex gap-2 w-full max-w-[420px] mb-2 lg:mb-4" aria-hidden="true">
+        {steps.map((s) => (
+          <span class="relative h-1 flex-1 rounded-full bg-white/[0.08] overflow-hidden">
+            <span class="ly-bar-fill absolute inset-0 rounded-full origin-left" style={`background:${s.color === 'url' ? 'linear-gradient(90deg,#5b9dff,#a78bfa,#34d399,#fbbf24)' : s.color}`}></span>
+          </span>
+        ))}
+      </div>
+
+      <div class="relative w-full h-[40vh] lg:h-auto min-h-0 lg:flex-1 flex items-center justify-center">
+        <div class="absolute inset-[12%] pointer-events-none" style="background: radial-gradient(closest-side, rgba(139,92,246,0.28), rgba(16,185,129,0.1), transparent)"></div>
+        <svg viewBox="0 0 580 600" class="relative h-full w-auto max-w-full overflow-visible" aria-hidden="true">
+          <defs>
+            <filter id="ly-glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3.5" result="b" />
+              <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
+            {layers.map((l) => (
+              <linearGradient id={`ly-fill-${l.key}`} x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color={l.color} stop-opacity="0.30" />
+                <stop offset="1" stop-color={l.color} stop-opacity="0.06" />
+              </linearGradient>
+            ))}
+          </defs>
+
+          {[...layers].reverse().map((l) => {
+            const lab = pt(l.cy, -1.14, 0.9);
+            return (
+              <g class="ly-layer">
+                <polygon points={diamond(l.cy)} fill={`url(#ly-fill-${l.key})`} stroke={l.color} stroke-opacity="0.85" stroke-width="1.6" stroke-linejoin="round" />
+                <path d={grid(l.cy)} stroke={l.color} stroke-opacity="0.16" fill="none" />
+                <text transform={`matrix(0.894 -0.447 0.894 0.447 ${lab.x} ${lab.y})`} font-family="Geist Mono, ui-monospace, monospace" font-size="13" font-weight="500" letter-spacing="3" fill={l.color}>{l.name}</text>
+                {Object.entries(nodes).filter(([, n]) => n.layer === l.key).map(([id, n]) => (
+                  <g>
+                    <circle cx={P[id].x} cy={P[id].y} r="4.5" fill="#0a1122" stroke={l.color} stroke-width="2" filter="url(#ly-glow)" />
+                    <circle cx={P[id].x} cy={P[id].y} r="1.6" fill={l.color} />
+                    <text class="ly-node-label" x={P[id].x + 9} y={P[id].y - 7} font-family="Geist Mono, ui-monospace, monospace" font-size="10" fill="#d6def0" fill-opacity="0.85">{n.label}</text>
+                  </g>
+                ))}
+              </g>
+            );
+          })}
+
+          <g class="ly-threads">
+            {threads.map((t) => (
+              <g>
+                <path d={toD(t.path)} stroke={t.color} stroke-opacity="0.18" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                <path class="ly-thread" d={toD(t.path)} pathLength="1" stroke={t.color} stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#ly-glow)" />
+              </g>
+            ))}
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Text: one tall block per layer, scrolling past normally -->
+    <div class="order-2 lg:order-1">
+      <!-- heading (desktop): pinned at the top of the left column; steps scroll beneath it -->
+      <div class="hidden lg:block sticky top-0 z-10 pt-28 pb-10 bg-[linear-gradient(to_bottom,var(--color-background)_80%,transparent)]">
+        <p class="eyebrow mb-4">Layer by layer</p>
+        <h2 class="display text-[2.6rem]">
+          Your system is layers.<span class="serif-accent tone-accent block">We watch every one.</span>
+        </h2>
+        <p class="text-text-muted text-[16px] leading-relaxed mt-3 max-w-md">
+          Where the answers come from, and exactly what access each layer needs.
+        </p>
+      </div>
+      <ol class="pt-8 lg:pt-[6vh] lg:pb-[30vh]">
+        {steps.map((s) => (
+          <li class="ly-step min-h-[42vh] lg:min-h-[50vh] flex flex-col justify-center py-6">
+            <div class="flex items-center gap-3 mb-3">
+              <span
+                class="flex items-center justify-center w-9 h-9 rounded-xl font-mono text-[13px]"
+                style={`background:${s.color === 'url' ? 'linear-gradient(135deg,#5b9dff,#a78bfa 40%,#34d399 70%,#fbbf24)' : s.color + '26'}; border:1px solid ${s.color === 'url' ? 'transparent' : s.color + '66'}; color:${s.color === 'url' ? '#0a1122' : s.color}`}
+              >{s.n}</span>
+              <h3 class="text-2xl sm:text-3xl font-medium tracking-tight text-text">{s.title}</h3>
+            </div>
+            <p class="text-text-muted text-[17px] leading-relaxed max-w-md">{s.body}</p>
+            <dl class="mt-5 max-w-md rounded-xl border border-border-subtle bg-background/60 divide-y divide-border-subtle text-[13px]">
+              <div class="flex gap-4 px-4 py-2.5">
+                <dt class="w-24 shrink-0 font-mono text-[11px] uppercase tracking-[0.12em] text-text-dim pt-px">Connects</dt>
+                <dd class="text-text">{s.connects}</dd>
+              </div>
+              <div class="flex gap-4 px-4 py-2.5">
+                <dt class="w-24 shrink-0 font-mono text-[11px] uppercase tracking-[0.12em] text-text-dim pt-px">Access</dt>
+                <dd class="text-text-muted">{s.access}</dd>
+              </div>
+            </dl>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  gsap.registerPlugin(ScrollTrigger);
+
+  const root = document.querySelector<HTMLElement>('#layers');
+  const mm = gsap.matchMedia();
+
+  mm.add('(prefers-reduced-motion: no-preference)', () => {
+    if (!root) return;
+
+    const layers = gsap.utils.toArray<SVGGElement>('.ly-layer', root).reverse(); // code first
+    const blocks = gsap.utils.toArray<HTMLElement>('.ly-step', root);
+    const bars = gsap.utils.toArray<HTMLElement>('.ly-bar-fill', root);
+    const threads = gsap.utils.toArray<SVGPathElement>('.ly-thread', root);
+    const last = blocks.length - 1;
+    const DUR = 0.7;
+
+    const render = (i: number, instant = false) => {
+      const d = instant ? 0 : DUR;
+      layers.forEach((layer, j) => {
+        const shown = j <= i;
+        gsap.to(layer, { opacity: shown ? (j === i || i === last ? 1 : 0.4) : 0, y: shown ? 0 : 120, duration: d, ease: 'power3.out', overwrite: true });
+      });
+      blocks.forEach((b, j) => gsap.to(b, { opacity: j === i ? 1 : 0.3, duration: instant ? 0 : 0.4, overwrite: true }));
+      bars.forEach((bar, j) => gsap.to(bar, { scaleX: j <= i ? 1 : 0, duration: d, ease: 'power3.out', overwrite: true }));
+      const t = i === last;
+      gsap.to('.ly-threads', { opacity: t ? 1 : 0, duration: instant ? 0 : 0.3, overwrite: true });
+      gsap.to(threads, { strokeDashoffset: t ? 0 : 1, duration: instant ? 0 : 0.9, stagger: t ? 0.08 : 0, ease: 'power2.out', overwrite: true });
+    };
+
+    gsap.set(threads, { strokeDasharray: 1, strokeDashoffset: 1 });
+    let current = 0;
+    render(0, true);
+
+    // Each block becomes active while it crosses the reading line: the middle of
+    // the screen on desktop; on phones, the visible area below the pinned stack.
+    const line = window.matchMedia('(min-width: 1024px)').matches ? '55%' : '78%';
+    const setActive = (i: number) => {
+      if (i === current) return;
+      current = i;
+      render(i);
+    };
+
+    const triggers = blocks.map((block, i) =>
+      ScrollTrigger.create({
+        trigger: block,
+        start: `top ${line}`,
+        end: `bottom ${line}`,
+        onToggle: (self) => { if (self.isActive) setActive(i); },
+        // a jump (nav link, fast scroll) can skip the edge blocks entirely:
+        // above the first step show layer 1, below the last show the full stack
+        onLeaveBack: i === 0 ? () => setActive(0) : undefined,
+        onLeave: i === last ? () => setActive(last) : undefined,
+      })
+    );
+
+    return () => triggers.forEach((t) => t.kill());
+  });
+</script>

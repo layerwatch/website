@@ -1,0 +1,104 @@
+---
+interface Props {
+  /** On sub-pages the section links point back to the landing page. */
+  home?: boolean;
+}
+
+const { home = true } = Astro.props;
+const base = home ? '' : '/';
+
+const links = [
+  { href: `${base}#problem`, label: 'Problem' },
+  { href: `${base}#layers`, label: 'Layers' },
+  { href: `${base}#map`, label: 'Workflow map' },
+  { href: `${base}#agents`, label: 'For agents' },
+  { href: `${base}#faq`, label: 'FAQ' },
+];
+
+const githubPath = 'M12 .5C5.73.5.75 5.48.75 11.75c0 5.02 3.26 9.28 7.77 10.78.57.1.78-.25.78-.55 0-.27-.01-1.16-.02-2.1-3.16.69-3.83-1.34-3.83-1.34-.52-1.31-1.26-1.66-1.26-1.66-1.03-.7.08-.69.08-.69 1.14.08 1.74 1.17 1.74 1.17 1.01 1.73 2.65 1.23 3.3.94.1-.73.4-1.23.72-1.51-2.52-.29-5.17-1.26-5.17-5.6 0-1.24.44-2.25 1.17-3.04-.12-.29-.51-1.45.11-3.02 0 0 .96-.31 3.14 1.16a10.9 10.9 0 0 1 5.72 0c2.18-1.47 3.14-1.16 3.14-1.16.62 1.57.23 2.73.11 3.02.73.79 1.17 1.8 1.17 3.04 0 4.35-2.66 5.31-5.19 5.59.41.35.77 1.04.77 2.1 0 1.52-.01 2.74-.01 3.11 0 .3.2.66.79.55A11.26 11.26 0 0 0 23.25 11.75C23.25 5.48 18.27.5 12 .5Z';
+---
+
+<div class="fixed top-3 sm:top-5 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] max-w-6xl">
+  <header class="floating-nav rounded-2xl border border-border-subtle bg-surface/70 backdrop-blur-md">
+    <div class="flex items-center justify-between gap-4 pl-3 pr-2 sm:pl-4 h-14">
+      <a href="/" class="flex items-center shrink-0" aria-label="Layerwatch home">
+        <img src="/logo.svg" alt="Layerwatch" width="73" height="42" class="h-[42px] w-auto" />
+      </a>
+
+      <nav aria-label="Primary" class="hidden lg:block">
+        <ul class="flex items-center gap-1 text-[13.5px]">
+          {links.map((l) => (
+            <li>
+              <a href={l.href} class="px-3 py-2 rounded-lg text-text-muted hover:text-white hover:bg-white/[0.04] transition-colors">{l.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div class="flex items-center gap-1.5">
+        <a
+          href="https://github.com/layerwatch"
+          class="hidden sm:inline-flex items-center justify-center w-11 h-11 rounded-lg text-text-muted hover:text-white hover:bg-white/[0.04] transition-colors"
+          aria-label="Layerwatch on GitHub"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={githubPath} /></svg>
+        </a>
+        <a href={`${base}#early-access`} class="btn-primary !px-4 !text-[13px]">
+          Early access
+        </a>
+        <button
+          type="button"
+          class="nav-toggle lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-lg text-text-muted hover:text-white hover:bg-white/[0.04] transition-colors"
+          aria-expanded="false"
+          aria-controls="mobile-nav"
+          aria-label="Open menu"
+        >
+          <svg class="nav-icon-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+          <svg class="nav-icon-close hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- menu for tablets and phones -->
+    <nav id="mobile-nav" aria-label="Primary" class="lg:hidden border-t border-border-subtle px-2 py-2" hidden>
+      <ul class="flex flex-col">
+        {links.map((l) => (
+          <li>
+            <a href={l.href} class="flex items-center min-h-11 px-3 rounded-lg text-[15px] text-text hover:bg-white/[0.04] transition-colors">{l.label}</a>
+          </li>
+        ))}
+        <li class="sm:hidden">
+          <a href="https://github.com/layerwatch" class="flex items-center gap-2 min-h-11 px-3 rounded-lg text-[15px] text-text-muted hover:bg-white/[0.04] transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d={githubPath} /></svg>
+            GitHub
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+</div>
+
+<script>
+  const nav = document.querySelector('.floating-nav');
+  const onScroll = () => nav?.classList.toggle('is-scrolled', window.scrollY > 40);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // Mobile menu: toggles open/closed, closes on link click, Escape or wider screens.
+  const toggle = document.querySelector<HTMLButtonElement>('.nav-toggle');
+  const menu = document.getElementById('mobile-nav');
+  const setOpen = (open: boolean) => {
+    if (!toggle || !menu) return;
+    menu.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    toggle.querySelector('.nav-icon-open')?.classList.toggle('hidden', open);
+    toggle.querySelector('.nav-icon-close')?.classList.toggle('hidden', !open);
+  };
+  toggle?.addEventListener('click', () => setOpen(menu?.hidden ?? false));
+  menu?.addEventListener('click', (e) => { if ((e.target as HTMLElement).closest('a')) setOpen(false); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && menu && !menu.hidden) { setOpen(false); toggle?.focus(); }
+  });
+  window.matchMedia('(min-width: 1024px)').addEventListener('change', (e) => { if (e.matches) setOpen(false); });
+</script>

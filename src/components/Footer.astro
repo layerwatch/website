@@ -1,0 +1,59 @@
+---
+const year = new Date().getFullYear();
+
+const product = [
+  { href: '/#layers', label: 'Layers' },
+  { href: '/#map', label: 'Workflow map' },
+  { href: '/#agents', label: 'MCP for agents' },
+  { href: '/#trust', label: 'Trust' },
+];
+
+const connect = [
+  { href: 'https://github.com/layerwatch', label: 'GitHub' },
+  { href: 'https://x.com/layerwatch', label: 'X / Twitter' },
+  { href: 'mailto:hi@layerwatch.dev', label: 'hi@layerwatch.dev' },
+  { href: 'mailto:security@layerwatch.dev', label: 'Security: security@layerwatch.dev' },
+];
+
+// py-2.5 on the links keeps tap targets comfortable on phones
+const linkClass = 'inline-block py-2.5 sm:py-1 text-text-muted hover:text-white transition-colors';
+---
+
+<footer class="relative border-t border-border-subtle px-6 pt-16 pb-10 overflow-hidden">
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl section-rule"></div>
+
+  <div class="max-w-6xl mx-auto relative z-10">
+    <div class="grid gap-10 sm:grid-cols-[1.4fr_1fr_1fr] pb-12">
+      <div>
+        <a href="/" aria-label="Layerwatch home" class="inline-block">
+          <img src="/logo.svg" alt="Layerwatch" width="62" height="36" class="h-9 w-auto" />
+        </a>
+        <p class="mt-4 text-sm text-text-muted max-w-xs leading-relaxed">
+          An evidence-backed map of your running application — for engineers and their coding agents.
+        </p>
+      </div>
+
+      <div>
+        <p class="font-mono text-[11px] uppercase tracking-[0.14em] text-text-dim mb-3">Product</p>
+        <ul class="text-sm">
+          {product.map((l) => <li><a href={l.href} class={linkClass}>{l.label}</a></li>)}
+        </ul>
+      </div>
+
+      <div>
+        <p class="font-mono text-[11px] uppercase tracking-[0.14em] text-text-dim mb-3">Connect</p>
+        <ul class="text-sm">
+          {connect.map((l) => <li><a href={l.href} class={linkClass}>{l.label}</a></li>)}
+        </ul>
+      </div>
+    </div>
+
+    <div class="pt-6 border-t border-border-subtle flex flex-col sm:flex-row justify-between gap-3">
+      <p class="text-text-dim text-xs">© {year} Layerwatch. All rights reserved.</p>
+      <div class="flex gap-5 text-xs">
+        <a href="/privacy" class="inline-block py-2.5 sm:py-0 text-text-dim hover:text-white transition-colors">Privacy</a>
+        <a href="/terms" class="inline-block py-2.5 sm:py-0 text-text-dim hover:text-white transition-colors">Terms</a>
+      </div>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,80 @@
+---
+// Hero visual: the product answering one real question. It shows, in one
+// glance, what Layerwatch does — joins code, deploy and runtime, says which
+// value is actually live, shows the evidence, and surfaces the conflict.
+// Synthetic example data (the owned reference app), not a customer system.
+
+const rows = [
+  { layer: 'Code',     color: '#5b9dff', source: 'settings.py:12 · default',        value: '8',  basis: 'declared',   note: 'overridden', struck: true },
+  { layer: 'Deploy',   color: '#a78bfa', source: 'values-prod.yaml:22',             value: '30', basis: 'configured', note: '',           struck: false },
+  { layer: 'Runtime',  color: '#34d399', source: 'celery inspect · report-worker-7f9c', value: '30', basis: 'observed',   note: '14:22:07Z',  struck: false },
+  { layer: 'Conflict', color: '#fb923c', source: 'ConfigMap/report-worker now says', value: '50', basis: 'observed', note: 'possible cause: pods predate the edit (not proven)', struck: false },
+];
+---
+
+<div class="relative w-full max-w-[520px] mx-auto">
+  <div class="absolute -inset-10 pointer-events-none" style="background: radial-gradient(closest-side, rgba(59,130,246,0.22), transparent)"></div>
+
+  <div class="relative panel rounded-2xl overflow-hidden text-left">
+    <!-- header -->
+    <div class="flex items-center justify-between gap-3 px-5 py-3 border-b border-border-subtle bg-black/20">
+      <span class="flex items-center gap-2 font-mono text-[11px] text-text-dim">
+        <span class="w-1.5 h-1.5 rounded-full bg-observed"></span>
+        layerwatch · env: prod
+      </span>
+      <span class="font-mono text-[10.5px] text-text-dim">snapshot 14:22Z</span>
+    </div>
+
+    <!-- question -->
+    <div class="ha-row px-5 pt-5">
+      <p class="font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-dim mb-2">Question</p>
+      <p class="text-[15.5px] text-text leading-snug">What concurrency is <span class="font-mono text-[14px] text-primary-light">report-worker</span> actually running in prod?</p>
+    </div>
+
+    <!-- answer -->
+    <div class="ha-row mx-5 mt-4 rounded-xl border border-observed/30 bg-observed/[0.07] px-4 py-3.5 flex items-center gap-4">
+      <span class="display text-[2.6rem] leading-none text-text">30</span>
+      <div class="min-w-0">
+        <span class="chip chip-observed">observed</span>
+        <p class="font-mono text-[11px] text-text-muted mt-1.5">reported by the worker itself · 14:22:07Z</p>
+      </div>
+    </div>
+
+    <!-- evidence chain -->
+    <div class="px-5 pt-5 pb-2">
+      <p class="ha-row font-mono text-[10.5px] uppercase tracking-[0.14em] text-text-dim mb-2">How we know</p>
+      <ol>
+        {rows.map((r) => (
+          <li class="ha-row grid grid-cols-[76px_1fr_auto] items-center gap-3 py-2.5 border-t border-border-subtle first:border-t-0">
+            <span class="flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-[0.1em]" style={`color:${r.color}`}>
+              <span class="w-1.5 h-1.5 rounded-full" style={`background:${r.color}`}></span>{r.layer}
+            </span>
+            <span class="min-w-0">
+              <span class="block font-mono text-[11.5px] text-text-muted break-words">{r.source}</span>
+              {r.note && <span class="block font-mono text-[10px] text-text-dim">{r.note}</span>}
+            </span>
+            <span class="flex items-center gap-2.5">
+              <span class={`font-mono text-[15px] ${r.struck ? 'line-through text-text-dim' : 'text-text'}`}>{r.value}</span>
+              <span class="hidden sm:inline-flex"><span class={`chip chip-${r.basis}`}>{r.basis}</span></span>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </div>
+
+    <div class="px-5 py-3 border-t border-border-subtle bg-black/20 font-mono text-[10.5px] text-text-dim">
+      3 layers joined · 1 conflict shown · cause marked unproven
+    </div>
+  </div>
+
+  <!-- agents get the same answer -->
+  <div class="hero-card drift absolute -right-6 -bottom-[4.5rem] hidden sm:block">
+    <div class="paper hero-paper rounded-xl px-3.5 py-2.5 w-[250px]" style="--edge:#c4a1ff">
+      <div class="flex items-center justify-between gap-2 mb-1.5">
+        <span class="font-mono text-[10px] text-text-dim">your coding agent · MCP</span>
+      </div>
+      <p class="font-mono text-[11.5px] text-text leading-snug"><span class="text-inferred">get_setting</span>("report-worker")</p>
+      <p class="font-mono text-[10px] text-text-dim mt-0.5">→ same answer, same evidence</p>
+    </div>
+  </div>
+</div>

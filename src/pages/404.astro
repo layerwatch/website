@@ -1,0 +1,22 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Page not found — Layerwatch" description="This page doesn't exist.">
+  <Nav home={false} />
+
+  <main id="main" class="relative px-6 pt-44 pb-32 max-w-2xl mx-auto text-center">
+    <p class="eyebrow mb-5 justify-center">404</p>
+    <h1 class="display text-4xl sm:text-5xl mb-5">
+      Nothing observed <span class="serif-accent gradient-text">here.</span>
+    </h1>
+    <p class="text-text-muted text-[17px] leading-relaxed mb-10">
+      This page doesn't exist, or it moved. We'd rather say so than guess.
+    </p>
+    <a href="/" class="btn-primary">Back to the homepage</a>
+  </main>
+
+  <Footer />
+</Layout>

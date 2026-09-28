@@ -1,0 +1,162 @@
+---
+// Interactive sample workflow: click a node to open its evidence drawer.
+// All data is synthetic — it mirrors the owned reference application.
+
+type Basis = 'declared' | 'configured' | 'observed' | 'inferred' | 'unresolved';
+
+interface Claim { basis: Basis; text: string; locator: string; time?: string }
+interface Node { id: string; kind: string; name: string; sub: string; claims: Claim[] }
+interface Edge { basis: Basis; label: string }
+
+const nodes: Node[] = [
+  {
+    id: 'producer', kind: 'producer', name: 'ingest-api', sub: 'repo: ingest-service',
+    claims: [
+      { basis: 'declared', text: 'POST /assets calls reports.build.delay(asset_id)', locator: 'ingest-service@4e1a9c2 · api/assets.py:88' },
+      { basis: 'observed', text: 'Deployment ingest-api runs image sha256:9b1f…', locator: 'k8s prod/ingest-api · rv 118204', time: '14:21:58Z' },
+    ],
+  },
+  {
+    id: 'queue', kind: 'queue', name: 'reports', sub: 'redis-broker:6379/0',
+    claims: [
+      { basis: 'configured', text: 'task_routes maps reports.* → queue "reports"', locator: 'worker-service@b73d010 · celeryconfig.py:14' },
+      { basis: 'configured', text: 'Broker URL resolves to redis-broker:6379/0 (not the cache on /2)', locator: 'values-prod.yaml:9 → Deployment env BROKER_URL' },
+      { basis: 'unresolved', text: 'Queue name "reports" also exists on staging broker — not joined', locator: 'identity rule: broker + db + name' },
+    ],
+  },
+  {
+    id: 'worker', kind: 'consumer', name: 'report-worker', sub: '3 pods · celery prefork',
+    claims: [
+      { basis: 'observed', text: 'All 3 workers are consuming queue "reports"', locator: 'celery inspect active_queues', time: '14:22:07Z' },
+      { basis: 'configured', text: 'REPORT_DB_URL comes from secret "reporting-db" (reference only, value never read)', locator: 'k8s prod/report-worker · env[4].valueFrom' },
+      { basis: 'observed', text: 'Pod report-worker-2c1d still runs the previous image', locator: 'k8s prod/report-worker-2c1d · status.imageID', time: '14:22:03Z' },
+    ],
+  },
+  {
+    id: 'db', kind: 'datastore', name: 'reporting', sub: 'postgres · asset_reports',
+    claims: [
+      { basis: 'declared', text: 'Written by report-worker: INSERT INTO asset_reports', locator: 'worker-service@b73d010 · tasks.py:57' },
+      { basis: 'inferred', text: 'Read by report-api for GET /reports/:id', locator: 'reporting-service@2d9f7aa · queries.py:31 (model candidate, no trace yet)' },
+      { basis: 'observed', text: 'Its own Postgres instance, reporting-db, not the main app database', locator: 'pg_catalog · reporting-db/reporting', time: '14:20:41Z' },
+      { basis: 'unresolved', text: 'Why a separate database was introduced: not recorded', locator: 'no decision record or PR rationale found' },
+    ],
+  },
+  {
+    id: 'api', kind: 'reader', name: 'report-api', sub: 'repo: reporting-service',
+    claims: [
+      { basis: 'inferred', text: 'Reads asset_reports by asset_id for GET /reports/:id', locator: 'reporting-service@2d9f7aa · queries.py:31 (model candidate)' },
+      { basis: 'unresolved', text: 'Timeout for the report call: loader not supported yet', locator: 'config read via custom loader · settings/dynamic.py' },
+    ],
+  },
+];
+
+const edges: Edge[] = [
+  { basis: 'declared',   label: 'publishes' },
+  { basis: 'observed',   label: 'consumed by' },
+  { basis: 'declared',   label: 'writes' },
+  { basis: 'inferred',   label: 'read by' },
+];
+
+const legend: Basis[] = ['declared', 'configured', 'observed', 'inferred', 'unresolved'];
+
+const kindIcon: Record<string, string> = {
+  producer: 'M4 12h10M10 6l6 6-6 6M20 5v14',
+  queue: 'M3 7h18M3 12h18M3 17h18',
+  consumer: 'M4 7h16v10H4zM8 11h8',
+  datastore: 'M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3',
+  reader: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z',
+};
+---
+
+<div class="wf panel paper rounded-3xl p-4 sm:p-6 lg:p-8">
+  <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+    <div class="flex items-center gap-3">
+      <span class="font-mono text-xs text-text-dim">workflow</span>
+      <span class="font-mono text-sm text-text">customer-report</span>
+      <span class="font-mono text-xs px-2 py-0.5 rounded-md border border-border-strong text-text-muted">env: prod</span>
+    </div>
+    <span class="font-mono text-[11px] text-text-dim">snapshot 2026-09-28 14:22Z · synthetic data</span>
+  </div>
+
+  <!-- chain -->
+  <div class="flex flex-col lg:flex-row lg:items-stretch">
+    {nodes.map((n, i) => (
+      <>
+        <button
+          type="button"
+          class="wf-node text-left rounded-2xl border border-border-subtle bg-background/60 px-4 py-3.5 lg:flex-1 min-w-0 cursor-pointer"
+          data-node={n.id}
+          aria-pressed={n.id === 'db' ? 'true' : 'false'}
+          aria-controls="wf-drawer"
+        >
+          <span class="flex items-center gap-2 text-text-dim">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={kindIcon[n.kind]} /></svg>
+            <span class="font-mono text-[10.5px] uppercase tracking-[0.12em]">{n.kind}</span>
+          </span>
+          <span class="block mt-1.5 font-medium text-[15px] text-text break-words">{n.name}</span>
+          <span class="block font-mono text-[11px] leading-snug text-text-muted break-words">{n.sub}</span>
+        </button>
+        {i < edges.length && (
+          <div class="relative flex lg:flex-col items-center justify-center lg:w-16 xl:w-20 shrink-0 h-12 lg:h-auto">
+            <span class={`edge-line edge-${edges[i].basis} block w-[2px] h-full lg:w-full lg:h-[2px]`}></span>
+            <span class="absolute left-[calc(50%+10px)] lg:left-auto lg:top-[calc(50%+8px)] font-mono text-[10px] text-text-dim whitespace-nowrap">{edges[i].label}</span>
+          </div>
+        )}
+      </>
+    ))}
+  </div>
+
+  <!-- legend -->
+  <div class="flex flex-wrap gap-x-5 gap-y-2 mt-6 text-[11px] font-mono text-text-muted">
+    {legend.map((basis) => (
+      <span class="flex items-center gap-2"><span class={`edge-line edge-${basis} inline-block w-6 h-[2px]`}></span>{basis}</span>
+    ))}
+  </div>
+
+  <!-- evidence drawer -->
+  <div id="wf-drawer" class="mt-6 rounded-2xl border border-border-subtle bg-background/70 overflow-hidden" aria-live="polite">
+    {nodes.map((n) => (
+      <div class="wf-panel" data-panel={n.id} hidden={n.id !== 'db'}>
+        <div class="flex items-center justify-between gap-3 px-5 py-3 border-b border-border-subtle bg-white/[0.015]">
+          <p class="text-sm"><span class="text-text-dim font-mono text-xs mr-2">evidence</span><span class="text-text font-medium">{n.name}</span></p>
+          <span class="font-mono text-[11px] text-text-dim">{n.claims.length} claims</span>
+        </div>
+        <ul class="divide-y divide-border-subtle">
+          {n.claims.map((c) => (
+            <li class="px-5 py-3.5 grid gap-2 sm:grid-cols-[110px_1fr] sm:gap-4 items-start">
+              <span class={`chip chip-${c.basis} justify-self-start`}>{c.basis}</span>
+              <div class="min-w-0">
+                <p class="text-[14px] text-text">{c.text}</p>
+                <p class="font-mono text-[11px] text-text-dim mt-1 break-words">
+                  {c.locator}{c.time && <span class="text-text-muted"> · {c.time}</span>}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('.wf').forEach((root) => {
+    const buttons = root.querySelectorAll<HTMLButtonElement>('.wf-node');
+    const panels = root.querySelectorAll<HTMLElement>('.wf-panel');
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.node;
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        panels.forEach((p) => {
+          const show = p.dataset.panel === id;
+          p.hidden = !show;
+          if (show) {
+            p.classList.remove('drawer-enter');
+            void p.offsetWidth;
+            p.classList.add('drawer-enter');
+          }
+        });
+      });
+    });
+  });
+</script>
