@@ -12,7 +12,6 @@ const connect = [
   { href: 'https://github.com/layerwatch', label: 'GitHub' },
   { href: 'https://x.com/layerwatch', label: 'X / Twitter' },
   { href: 'mailto:hi@layerwatch.dev', label: 'hi@layerwatch.dev' },
-  { href: 'mailto:security@layerwatch.dev', label: 'security@layerwatch.dev', note: 'Security reports' },
 ];
 
 // py-2.5 on the links keeps tap targets comfortable on phones
@@ -43,12 +42,7 @@ const linkClass = 'inline-block py-2.5 sm:py-1 text-text-muted hover:text-white 
       <div>
         <p class="font-mono text-[11px] uppercase tracking-[0.14em] text-text-dim mb-3">Connect</p>
         <ul class="text-sm">
-          {connect.map((l) => (
-            <li>
-              <a href={l.href} class={linkClass}>{l.label}</a>
-              {l.note && <span class="block -mt-2 sm:mt-0 text-[11px] text-text-dim">{l.note}</span>}
-            </li>
-          ))}
+          {connect.map((l) => <li><a href={l.href} class={linkClass}>{l.label}</a></li>)}
         </ul>
       </div>
     </div>
