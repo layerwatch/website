@@ -531,3 +531,33 @@ section[data-tone] .eyebrow { color: var(--acc-1); }
     0 18px 40px -16px rgba(0, 0, 0, 0.75),
     0 0 28px -6px color-mix(in srgb, var(--edge) 55%, transparent);
 }
+
+/* ---------- Copy confirmation (email links) ---------- */
+
+.copy-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  z-index: 100;
+  transform: translate(-50%, 12px);
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--color-observed) 45%, transparent);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.copy-toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.copy-toast::before {
+  content: "✓ ";
+  color: var(--color-observed);
+}

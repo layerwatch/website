@@ -76,6 +76,33 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
         dropHash();
       });
 
+      // Email links: on desktop, many people have no default mail app, so a
+      // mailto: click just opens an empty tab. Copy the address instead and
+      // confirm it. Phones always have a mail app, so they keep mailto.
+      const toast = document.createElement('div');
+      toast.setAttribute('role', 'status');
+      toast.className = 'copy-toast';
+      document.body.appendChild(toast);
+      let toastTimer: number | undefined;
+      const showToast = (text: string) => {
+        toast.textContent = text;
+        toast.classList.add('is-visible');
+        clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 2200);
+      };
+      document.addEventListener('click', async (e) => {
+        const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href^="mailto:"]');
+        if (!a || matchMedia('(pointer: coarse)').matches) return;
+        e.preventDefault();
+        const address = a.href.replace(/^mailto:/, '').split('?')[0];
+        try {
+          await navigator.clipboard.writeText(address);
+          showToast(`Copied ${address}`);
+        } catch {
+          location.href = a.href; // clipboard blocked: fall back to the mail app
+        }
+      });
+
       // Arriving from another page with a hash (e.g. /#layers): go there once, then drop it.
       if (location.hash && location.hash !== '#main') {
         window.addEventListener('load', () => {
